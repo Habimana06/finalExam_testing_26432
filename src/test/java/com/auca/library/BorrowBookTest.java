@@ -1,0 +1,60 @@
+package com.auca.library;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.UUID;
+
+import org.junit.Test;
+
+import com.auca.library.domain.Book;
+import com.auca.library.domain.BookStatus;
+import com.auca.library.domain.Borrower;
+import com.auca.library.domain.Location;
+import com.auca.library.domain.MembershipType;
+import com.auca.library.domain.User;
+import com.auca.library.service.BorrowService;
+
+public class BorrowBookTest extends TestBase {
+
+    @Test
+    public void borrowBook_availableBook_createsBorrowerRecordWithZeroFine() {
+        Location village = createFullHierarchy("BB" + UUID.randomUUID().toString().substring(0, 4));
+        User user = createUser("borrow_" + UUID.randomUUID().toString().substring(0, 5), "pass", village);
+        MembershipType gold = createMembershipType("Gold", 5, 50);
+        createApprovedMembership(user, gold);
+        Book book = createAvailableBook("Java Basics");
+
+        Borrower borrower = borrowService.borrowBook(user.getPersonId(), book.getBookId());
+
+        assertNotNull(borrower.getId());
+        assertEquals(0, borrower.getFine());
+    }
+
+    @Test
+    public void borrowBook_setsBookStatusToBorrowed() {
+        Location village = createFullHierarchy("BS" + UUID.randomUUID().toString().substring(0, 4));
+        User user = createUser("status_" + UUID.randomUUID().toString().substring(0, 5), "pass", village);
+        MembershipType gold = createMembershipType("Gold", 5, 50);
+        createApprovedMembership(user, gold);
+        Book book = createAvailableBook("Hibernate Guide");
+
+        borrowService.borrowBook(user.getPersonId(), book.getBookId());
+
+        Book updated = bookService.findById(book.getBookId());
+        assertEquals(BookStatus.BORROWED, updated.getBookStatus());
+    }
+
+    @Test
+    public void borrowBook_dueDateIsPickupDatePlusLoanPeriod() {
+        Location village = createFullHierarchy("BD" + UUID.randomUUID().toString().substring(0, 4));
+        User user = createUser("due_" + UUID.randomUUID().toString().substring(0, 5), "pass", village);
+        MembershipType gold = createMembershipType("Gold", 5, 50);
+        createApprovedMembership(user, gold);
+        Book book = createAvailableBook("Testing Book");
+
+        Borrower borrower = borrowService.borrowBook(user.getPersonId(), book.getBookId());
+
+        assertEquals(borrower.getPickupDate().plusDays(BorrowService.LOAN_PERIOD_DAYS), borrower.getDueDate());
+    }
+}
