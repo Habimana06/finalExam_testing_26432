@@ -39,7 +39,8 @@ public class TestBase {
 
     @BeforeClass
     public static void setUpClass() {
-        sessionFactory = HibernateUtil.buildSessionFactory("application-test.properties");
+        // use the same application.properties as the main app
+        sessionFactory = HibernateUtil.buildSessionFactory("application.properties");
         locationService = new LocationService(sessionFactory);
         userService = new UserService(sessionFactory);
         membershipService = new MembershipService(sessionFactory);
