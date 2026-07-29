@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.auca.library.domain.Location;
 import com.auca.library.domain.LocationType;
+import com.auca.library.domain.User;
 
 public class LocationServiceTest extends TestBase {
 
@@ -62,6 +63,18 @@ public class LocationServiceTest extends TestBase {
         Location village = createFullHierarchy(prefix);
 
         String provinceName = locationService.getProvinceNameByVillageId(village.getLocationId());
+
+        assertEquals(prefix + " Province", provinceName);
+    }
+
+    @Test
+    public void validPersonId_returnsCorrectProvinceName() {
+        String prefix = "PP" + UUID.randomUUID().toString().substring(0, 4);
+        Location village = createFullHierarchy(prefix);
+        User user = createUser(
+                "person_" + UUID.randomUUID().toString().substring(0, 5), "pass123", village);
+
+        String provinceName = locationService.getProvinceNameByPersonId(user.getPersonId());
 
         assertEquals(prefix + " Province", provinceName);
     }

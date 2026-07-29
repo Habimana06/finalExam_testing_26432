@@ -15,6 +15,7 @@ import com.auca.library.domain.Location;
 import com.auca.library.domain.MembershipType;
 import com.auca.library.domain.User;
 
+// tests for calculateLateFee in BorrowService
 public class LateFeeTest extends TestBase {
 
     @Test
@@ -93,10 +94,9 @@ public class LateFeeTest extends TestBase {
         setBorrowerDates(borrower.getId(), due.minusDays(14), due, null);
 
         int fee = borrowService.calculateLateFee(borrower.getId());
-        assertEquals(100, fee); // 2 days late * 50 Rwf
+        assertEquals(100, fee);
     }
 
-    // helper to change pickup, due and return dates for fee tests
     private void setBorrowerDates(UUID borrowerId, LocalDate pickup, LocalDate due, LocalDate returned) {
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {

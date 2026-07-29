@@ -9,9 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.auca.library.domain.Location;
-import com.auca.library.domain.User;
 
-public class AuthenticationTest extends TestBase {
+// tests for UserService only
+public class UserServiceTest extends TestBase {
 
     private String username;
     private String password;

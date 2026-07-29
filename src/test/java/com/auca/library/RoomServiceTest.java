@@ -1,6 +1,7 @@
 package com.auca.library;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,34 +13,8 @@ import com.auca.library.domain.BookStatus;
 import com.auca.library.domain.Room;
 import com.auca.library.domain.Shelf;
 
-public class ShelfRoomTest extends TestBase {
-
-    @Test
-    public void assignBookToShelf_updatesBookShelfId() {
-        Room room = roomService.saveRoom(new Room(UUID.randomUUID(), "ROOM-A"));
-        Shelf shelf = roomService.saveShelf(new Shelf(UUID.randomUUID(), "Science", 0, 0, 0, room));
-        Book book = bookService.saveBook(new Book(UUID.randomUUID(), "Physics", "ISBN-PHY",
-                "AUCA", LocalDate.of(2019, 5, 1), 1, BookStatus.AVAILABLE, null));
-
-        bookService.assignBookToShelf(book.getBookId(), shelf.getShelfId());
-
-        Book updated = bookService.findById(book.getBookId());
-        assertEquals(shelf.getShelfId(), updated.getShelf().getShelfId());
-    }
-
-    @Test
-    public void assignBookToShelf_incrementsShelfAvailableStock() {
-        Room room = roomService.saveRoom(new Room(UUID.randomUUID(), "ROOM-B"));
-        Shelf shelf = roomService.saveShelf(new Shelf(UUID.randomUUID(), "Math", 0, 0, 0, room));
-        Book book = bookService.saveBook(new Book(UUID.randomUUID(), "Algebra", "ISBN-ALG",
-                "AUCA", LocalDate.of(2018, 3, 1), 1, BookStatus.AVAILABLE, null));
-
-        int before = roomService.findShelfById(shelf.getShelfId()).getAvailableStock();
-        bookService.assignBookToShelf(book.getBookId(), shelf.getShelfId());
-        int after = roomService.findShelfById(shelf.getShelfId()).getAvailableStock();
-
-        assertEquals(before + 1, after);
-    }
+// tests for RoomService only
+public class RoomServiceTest extends TestBase {
 
     @Test
     public void assignShelfToRoom_updatesShelfRoomId() {
@@ -59,11 +34,11 @@ public class ShelfRoomTest extends TestBase {
         Shelf shelf1 = roomService.saveShelf(new Shelf(UUID.randomUUID(), "Cat1", 0, 0, 0, room));
         Shelf shelf2 = roomService.saveShelf(new Shelf(UUID.randomUUID(), "Cat2", 0, 0, 0, room));
 
-        Book b1 = bookService.saveBook(new Book(UUID.randomUUID(), "Book1", "ISBN1", "P", LocalDate.of(2020, 1, 1), 1,
+        bookService.saveBook(new Book(UUID.randomUUID(), "Book1", "ISBN1", "P", LocalDate.of(2020, 1, 1), 1,
                 BookStatus.AVAILABLE, shelf1));
-        Book b2 = bookService.saveBook(new Book(UUID.randomUUID(), "Book2", "ISBN2", "P", LocalDate.of(2020, 1, 1), 1,
+        bookService.saveBook(new Book(UUID.randomUUID(), "Book2", "ISBN2", "P", LocalDate.of(2020, 1, 1), 1,
                 BookStatus.AVAILABLE, shelf1));
-        Book b3 = bookService.saveBook(new Book(UUID.randomUUID(), "Book3", "ISBN3", "P", LocalDate.of(2020, 1, 1), 1,
+        bookService.saveBook(new Book(UUID.randomUUID(), "Book3", "ISBN3", "P", LocalDate.of(2020, 1, 1), 1,
                 BookStatus.AVAILABLE, shelf2));
 
         assertEquals(3, roomService.countBooksInRoom(room.getRoomId()));
@@ -93,13 +68,11 @@ public class ShelfRoomTest extends TestBase {
                 BookStatus.AVAILABLE, shelfFew));
 
         Room result = roomService.findRoomWithFewestBooks();
-        // roomFew has 1 book, roomMany has 3 — but other tests may have created rooms.
-        // so we only assert that the returned room is not null and has the lowest among known rooms
         int fewCount = roomService.countBooksInRoom(roomFew.getRoomId());
         int manyCount = roomService.countBooksInRoom(roomMany.getRoomId());
         int resultCount = roomService.countBooksInRoom(result.getRoomId());
 
-        org.junit.Assert.assertTrue(fewCount < manyCount);
-        org.junit.Assert.assertTrue(resultCount <= fewCount);
+        assertTrue(fewCount < manyCount);
+        assertTrue(resultCount <= fewCount);
     }
 }

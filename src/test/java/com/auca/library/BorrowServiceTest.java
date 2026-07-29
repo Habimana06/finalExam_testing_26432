@@ -15,7 +15,8 @@ import com.auca.library.domain.MembershipType;
 import com.auca.library.domain.User;
 import com.auca.library.service.BorrowService;
 
-public class BorrowBookTest extends TestBase {
+// tests for borrowBook method in BorrowService
+public class BorrowServiceTest extends TestBase {
 
     @Test
     public void borrowBook_availableBook_createsBorrowerRecordWithZeroFine() {

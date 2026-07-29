@@ -10,6 +10,7 @@ import com.auca.library.domain.MembershipType;
 import com.auca.library.domain.User;
 import com.auca.library.exception.BorrowLimitExceededException;
 
+// tests for validateBorrowLimit in BorrowService
 public class BorrowLimitTest extends TestBase {
 
     @Test
@@ -24,7 +25,6 @@ public class BorrowLimitTest extends TestBase {
             borrowService.borrowBook(user.getPersonId(), book.getBookId());
         }
 
-        // should not throw - 5th is still allowed
         borrowService.validateBorrowLimit(user.getPersonId());
         Book fifth = createAvailableBook("GoldBook5");
         borrowService.borrowBook(user.getPersonId(), fifth.getBookId());
