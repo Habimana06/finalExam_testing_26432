@@ -1,130 +1,120 @@
 # AUCA Library Management System
 
-Final project for **Software Testing and Techniques**.
+Student final project for the course **Software Testing and Techniques**.
 
-This system manages hard-copy books in the AUCA library: who borrows a book, how many books a member can borrow, when the book should be returned, and late return fees.
+The system manages real (hard copy) books in the library. It tracks who borrowed a book, membership limits, due dates, and late return fees.
 
-There is **no UI**. Everything is checked with **JUnit 4** test cases that insert real data into PostgreSQL.
+No user interface is included. Data is inserted and verified using JUnit 4 tests with PostgreSQL.
 
 ---
 
-## Tech stack
+## Technologies used
 
 - Java 21
 - Maven
 - Hibernate ORM 6.5
-- PostgreSQL database: `auca_library_db`
+- PostgreSQL (`auca_library_db`)
 - JUnit 4
 
-Package: `com.auca.library`
+Main package: `com.auca.library`
 
 ---
 
-## Project folders
+## Folder structure
 
 ```
 com.auca.library
- ├── domain      entities and enums
- ├── dao          database access (Hibernate)
- ├── service      business rules
- ├── util         HibernateUtil
- └── exception   BorrowLimitExceededException
+ ├── domain      // entities and enums from the class diagram
+ ├── dao          // Hibernate database operations
+ ├── service      // business logic
+ ├── util         // HibernateUtil
+ └── exception   // custom exceptions
 ```
 
-`Person` is the superclass of `User`. It uses `@MappedSuperclass`, so **Person is not a table** in the database.
+Note: `Person` is a superclass of `User` using `@MappedSuperclass`.  
+Person is **not** created as a table in the database.
 
 ---
 
-## Setup
+## How to setup
 
-### 1. Create the database
-
-In PostgreSQL:
+**Step 1 — create the database**
 
 ```sql
 CREATE DATABASE auca_library_db;
 ```
 
-### 2. Check database login
+**Step 2 — update login details**
 
-File: `src/main/resources/application.properties`
+Open `src/main/resources/application.properties` and set your PostgreSQL username and password.
 
-```properties
-hibernate.connection.url=jdbc:postgresql://localhost:5432/auca_library_db
-hibernate.connection.username=postgres
-hibernate.connection.password=your_password
-hibernate.hbm2ddl.auto=update
-```
-
-Tests use this same file (no separate test properties file).
-
-### 3. Run the project tests
+**Step 3 — run tests**
 
 ```bash
 mvn test
 ```
 
-Compile only:
-
-```bash
-mvn compile
-```
-
 ---
 
-## Membership rules
+## Membership types
 
-| Type | Late fee per day | Max books |
-|------|------------------|-----------|
+| Membership | Price per late day | Max books allowed |
+|------------|--------------------|-------------------|
 | Gold | 50 Rwf | 5 |
 | Silver | 30 Rwf | 3 |
 | Striver | 10 Rwf | 2 |
 
-- Fine starts at **0** when borrowing
-- Late fee = days late × membership daily rate
-- Loan period = 14 days
+When a book is borrowed, the fine starts at 0.  
+If the book is returned late, fee = number of late days × membership daily price.  
+Normal loan period is 14 days.
 
 ---
 
-## Requirements covered
+## What was implemented
 
-1. Create locations (Province → District → Sector → Cell → Village)
-2. Get province name by village id
-3. Get province name by person id
-4. Authenticate user
-5. Register membership (starts as PENDING)
+1. Create location hierarchy (Province, District, Sector, Cell, Village)
+2. Find province name using village id
+3. Find province name using person id
+4. User authentication (username and password)
+5. Register membership (status starts as PENDING)
 6. Borrow a book
-7. Validate membership borrow limit
-8. Assign book to shelf
-9. Assign shelf to room
+7. Check membership borrow limit
+8. Assign book to a shelf
+9. Assign shelf to a room
 10. Count books in a room
-11. Find room with fewest books
+11. Find the room with the fewest books
 12. Calculate late return fees
 
 ---
 
-## Relationships (from class diagram)
+## Class diagram relationships
 
-- User **IS** a Person
-- User lives in a Village (Location)
-- Location has parent (province down to village)
-- User can have many Membership and Borrower records
-- Book is on a Shelf; Shelf is in a Room
-- Borrower links Reader (User) and Book
-
----
-
-## How to explain this project
-
-1. Domain classes match the UML diagram
-2. DAO classes talk to PostgreSQL with Hibernate
-3. Service classes contain the business rules
-4. JUnit tests insert sample data and check each requirement method
+- User inherits from Person
+- A user lives in a village (Location)
+- Location uses parent_id for Province → District → Sector → Cell → Village
+- A user can have memberships and borrow records
+- A book is kept on a shelf
+- A shelf is located in a room
 
 ---
 
-## Author
+## Test classes
 
-Student ID: 26432  
-GitHub: https://github.com/Habimana06/finalExam_testing_26432  
-Course: Software Testing and Techniques — AUCA
+| Test class | What it tests |
+|------------|---------------|
+| LocationServiceTest | locations and province lookup |
+| UserServiceTest | login / authentication |
+| MembershipServiceTest | membership registration |
+| BorrowServiceTest | borrowing a book |
+| BorrowLimitTest | max books per membership |
+| LateFeeTest | late return charges |
+| BookServiceTest | assign book to shelf |
+| RoomServiceTest | shelf/room and book counts |
+
+---
+
+## Student information
+
+- Student ID: 26432
+- Repository: https://github.com/Habimana06/finalExam_testing_26432
+- Course: Software Testing and Techniques (AUCA)
