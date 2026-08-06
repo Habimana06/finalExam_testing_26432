@@ -85,10 +85,10 @@ public class TestBase {
     protected User createUser(String username, String password, Location village) {
         User user = new User();
         user.setPersonId(UUID.randomUUID());
-        user.setFirstName("Test");
-        user.setLastName("User");
+        user.setFirstName("Jean");
+        user.setLastName("Uwimana");
         user.setGender(Gender.MALE);
-        user.setPhoneNumber("0780000000");
+        user.setPhoneNumber("0788123456");
         user.setPassword(password);
         user.setRole(Role.STUDENT);
         user.setUserName(username);
@@ -96,24 +96,24 @@ public class TestBase {
         return userService.registerUser(user);
     }
 
-    // helper to create membership type
+    // helper to create membership type (Gold, Silver, Striver)
     protected MembershipType createMembershipType(String name, int maxBooks, int price) {
         MembershipType type = new MembershipType(UUID.randomUUID(), name, maxBooks, price);
         return membershipService.saveMembershipType(type);
     }
 
-    // helper to create approved membership
+    // helper to create approved membership for borrowing
     protected Membership createApprovedMembership(User user, MembershipType type) {
         Membership membership = membershipService.registerMembership(user.getPersonId(), type.getMembershipTypeId());
         return membershipService.approveMembership(membership.getMembershipId());
     }
 
-    // helper to create room, shelf and available book
+    // helper to create room, shelf and one available book
     protected Book createAvailableBook(String title) {
-        Room room = roomService.saveRoom(new Room(UUID.randomUUID(), "R-" + UUID.randomUUID().toString().substring(0, 4)));
-        Shelf shelf = roomService.saveShelf(new Shelf(UUID.randomUUID(), "General", 0, 0, 0, room));
+        Room room = roomService.saveRoom(new Room(UUID.randomUUID(), "LIB-" + UUID.randomUUID().toString().substring(0, 4)));
+        Shelf shelf = roomService.saveShelf(new Shelf(UUID.randomUUID(), "Computer Science", 0, 0, 0, room));
         Book book = new Book(UUID.randomUUID(), title, "ISBN-" + UUID.randomUUID().toString().substring(0, 6),
-                "AUCA Press", LocalDate.of(2020, 1, 1), 1, BookStatus.AVAILABLE, shelf);
+                "AUCA Press", LocalDate.of(2021, 3, 15), 1, BookStatus.AVAILABLE, shelf);
         return bookService.saveBook(book);
     }
 }

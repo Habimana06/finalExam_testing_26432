@@ -22,6 +22,7 @@ public class LocationServiceTest extends TestBase {
         Location saved = locationService.createLocation(province, null);
 
         assertNotNull(saved.getLocationId());
+        assertEquals("Kigali", saved.getLocationName());
         assertEquals(LocationType.PROVINCE, saved.getLocationType());
         assertNull(saved.getParent());
     }
