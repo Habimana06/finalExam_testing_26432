@@ -10,6 +10,7 @@ import com.auca.library.dao.RoomDao;
 import com.auca.library.dao.ShelfDao;
 import com.auca.library.domain.Room;
 import com.auca.library.domain.Shelf;
+import com.auca.library.exception.EntityNotFoundException;
 
 public class RoomService {
 
@@ -43,12 +44,12 @@ public class RoomService {
     public void assignShelfToRoom(UUID shelfId, UUID roomId) {
         Shelf shelf = shelfDao.findById(shelfId);
         if (shelf == null) {
-            throw new IllegalArgumentException("Shelf not found");
+            throw new EntityNotFoundException("Shelf not found");
         }
 
         Room room = roomDao.findById(roomId);
         if (room == null) {
-            throw new IllegalArgumentException("Room not found");
+            throw new EntityNotFoundException("Room not found");
         }
 
         shelf.setRoom(room);
@@ -59,7 +60,7 @@ public class RoomService {
     public int countBooksInRoom(UUID roomId) {
         Room room = roomDao.findById(roomId);
         if (room == null) {
-            throw new IllegalArgumentException("Room not found");
+            throw new EntityNotFoundException("Room not found");
         }
         return bookDao.countBooksInRoom(roomId);
     }

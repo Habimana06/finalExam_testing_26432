@@ -13,6 +13,8 @@ import com.auca.library.domain.Borrower;
 import com.auca.library.domain.Location;
 import com.auca.library.domain.MembershipType;
 import com.auca.library.domain.User;
+import com.auca.library.exception.EntityNotFoundException;
+import com.auca.library.exception.InvalidBookStateException;
 import com.auca.library.service.BorrowService;
 
 // tests for borrowBook method in BorrowService
@@ -62,5 +64,31 @@ public class BorrowServiceTest extends TestBase {
 
         // due date = pickup date + 14 days
         assertEquals(borrower.getPickupDate().plusDays(BorrowService.LOAN_PERIOD_DAYS), borrower.getDueDate());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void borrowBook_unknownReader_throwsEntityNotFoundException() {
+        Book book = createAvailableBook("Missing Reader Book");
+        borrowService.borrowBook(UUID.randomUUID(), book.getBookId());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void borrowBook_unknownBook_throwsEntityNotFoundException() {
+        Location village = createFullHierarchy("NB" + UUID.randomUUID().toString().substring(0, 4));
+        User user = createUser("nobook_" + UUID.randomUUID().toString().substring(0, 5), "pass123", village);
+        MembershipType gold = createMembershipType("Gold", 5, 50);
+        createApprovedMembership(user, gold);
+        borrowService.borrowBook(user.getPersonId(), UUID.randomUUID());
+    }
+
+    @Test(expected = InvalidBookStateException.class)
+    public void borrowBook_unavailableBook_throwsInvalidBookStateException() {
+        Location village = createFullHierarchy("UB" + UUID.randomUUID().toString().substring(0, 4));
+        User user = createUser("unavail_" + UUID.randomUUID().toString().substring(0, 5), "pass123", village);
+        MembershipType gold = createMembershipType("Gold", 5, 50);
+        createApprovedMembership(user, gold);
+        Book book = createAvailableBook("Already Borrowed Title");
+        borrowService.borrowBook(user.getPersonId(), book.getBookId());
+        borrowService.borrowBook(user.getPersonId(), book.getBookId());
     }
 }

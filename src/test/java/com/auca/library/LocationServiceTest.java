@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.auca.library.domain.Location;
 import com.auca.library.domain.LocationType;
 import com.auca.library.domain.User;
+import com.auca.library.exception.BusinessRuleViolationException;
 
 public class LocationServiceTest extends TestBase {
 
@@ -41,14 +42,14 @@ public class LocationServiceTest extends TestBase {
         assertEquals(province.getLocationId(), saved.getParent().getLocationId());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BusinessRuleViolationException.class)
     public void createDistrict_withMissingParent_throwsException() {
         Location district = new Location(UUID.randomUUID(), "DIST-MISS-" + UUID.randomUUID().toString().substring(0, 4),
                 "NoParent", LocationType.DISTRICT, null);
         locationService.createLocation(district, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BusinessRuleViolationException.class)
     public void createLocation_duplicateLocationCode_throwsException() {
         String code = "DUP-" + UUID.randomUUID().toString().substring(0, 4);
         Location province1 = new Location(UUID.randomUUID(), code, "East", LocationType.PROVINCE, null);

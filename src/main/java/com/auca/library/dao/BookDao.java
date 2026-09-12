@@ -8,7 +8,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import com.auca.library.domain.Book;
-import com.auca.library.domain.BookStatus;
 
 public class BookDao {
 

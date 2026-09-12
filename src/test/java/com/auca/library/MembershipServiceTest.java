@@ -12,6 +12,7 @@ import com.auca.library.domain.Membership;
 import com.auca.library.domain.MembershipType;
 import com.auca.library.domain.Status;
 import com.auca.library.domain.User;
+import com.auca.library.exception.BusinessRuleViolationException;
 
 public class MembershipServiceTest extends TestBase {
 
@@ -33,7 +34,7 @@ public class MembershipServiceTest extends TestBase {
         assertEquals(user.getPersonId(), membership.getReader().getPersonId());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BusinessRuleViolationException.class)
     public void registerMembership_userAlreadyHasActiveMembership_throwsException() {
         Location village = createFullHierarchy("MA" + UUID.randomUUID().toString().substring(0, 4));
         User user = createUser("active_" + UUID.randomUUID().toString().substring(0, 5), "pass", village);

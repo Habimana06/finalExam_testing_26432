@@ -5,6 +5,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.auca.library.dao.BookDao;
 import com.auca.library.dao.BorrowerDao;
@@ -18,8 +20,12 @@ import com.auca.library.domain.Membership;
 import com.auca.library.domain.Shelf;
 import com.auca.library.domain.User;
 import com.auca.library.exception.BorrowLimitExceededException;
+import com.auca.library.exception.EntityNotFoundException;
+import com.auca.library.exception.InvalidBookStateException;
 
 public class BorrowService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BorrowService.class);
 
     // loan period is 14 days
     public static final int LOAN_PERIOD_DAYS = 14;
@@ -58,15 +64,18 @@ public class BorrowService {
     public Borrower borrowBook(UUID readerId, UUID bookId) {
         User reader = userDao.findById(readerId);
         if (reader == null) {
-            throw new IllegalArgumentException("Reader not found");
+            LOG.warn("Borrow rejected: reader not found, readerId={}", readerId);
+            throw new EntityNotFoundException("Reader not found");
         }
 
         Book book = bookDao.findById(bookId);
         if (book == null) {
-            throw new IllegalArgumentException("Book not found");
+            LOG.warn("Borrow rejected: book not found, bookId={}", bookId);
+            throw new EntityNotFoundException("Book not found");
         }
         if (book.getBookStatus() != BookStatus.AVAILABLE) {
-            throw new IllegalArgumentException("Book is not available");
+            LOG.warn("Borrow rejected: book not available, bookId={}, status={}", bookId, book.getBookStatus());
+            throw new InvalidBookStateException("Book is not available");
         }
 
         // check membership borrow limit
@@ -104,13 +113,13 @@ public class BorrowService {
     public int calculateLateFee(UUID borrowerId) {
         Borrower borrower = borrowerDao.findById(borrowerId);
         if (borrower == null) {
-            throw new IllegalArgumentException("Borrower record not found");
+            throw new EntityNotFoundException("Borrower record not found");
         }
 
         Membership membership = membershipDao.findApprovedByUserId(borrower.getReader().getPersonId());
         if (membership == null) {
             // try any membership that was used - still need daily rate
-            throw new IllegalArgumentException("No approved membership found for fee calculation");
+            throw new EntityNotFoundException("No approved membership found for fee calculation");
         }
 
         int dailyRate = membership.getMembershipType().getPrice();
@@ -136,7 +145,7 @@ public class BorrowService {
     public Borrower returnBook(UUID borrowerId, LocalDate returnDate) {
         Borrower borrower = borrowerDao.findById(borrowerId);
         if (borrower == null) {
-            throw new IllegalArgumentException("Borrower record not found");
+            throw new EntityNotFoundException("Borrower record not found");
         }
         borrower.setReturnDate(returnDate);
         borrowerDao.update(borrower);

@@ -8,6 +8,7 @@ import com.auca.library.dao.BookDao;
 import com.auca.library.dao.ShelfDao;
 import com.auca.library.domain.Book;
 import com.auca.library.domain.Shelf;
+import com.auca.library.exception.EntityNotFoundException;
 
 public class BookService {
 
@@ -31,12 +32,12 @@ public class BookService {
     public void assignBookToShelf(UUID bookId, UUID shelfId) {
         Book book = bookDao.findById(bookId);
         if (book == null) {
-            throw new IllegalArgumentException("Book not found");
+            throw new EntityNotFoundException("Book not found");
         }
 
         Shelf shelf = shelfDao.findById(shelfId);
         if (shelf == null) {
-            throw new IllegalArgumentException("Shelf not found");
+            throw new EntityNotFoundException("Shelf not found");
         }
 
         book.setShelf(shelf);

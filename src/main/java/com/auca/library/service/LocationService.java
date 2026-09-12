@@ -9,6 +9,8 @@ import com.auca.library.dao.UserDao;
 import com.auca.library.domain.Location;
 import com.auca.library.domain.LocationType;
 import com.auca.library.domain.User;
+import com.auca.library.exception.BusinessRuleViolationException;
+import com.auca.library.exception.EntityNotFoundException;
 
 public class LocationService {
 
@@ -23,18 +25,18 @@ public class LocationService {
     // create location (province has no parent, others need parent)
     public Location createLocation(Location location, UUID parentId) {
         if (location.getLocationCode() != null && locationDao.findByCode(location.getLocationCode()) != null) {
-            throw new IllegalArgumentException("Location code already exists");
+            throw new BusinessRuleViolationException("Location code already exists");
         }
 
         if (location.getLocationType() == LocationType.PROVINCE) {
             location.setParent(null);
         } else {
             if (parentId == null) {
-                throw new IllegalArgumentException("Parent location is required");
+                throw new BusinessRuleViolationException("Parent location is required");
             }
             Location parent = locationDao.findById(parentId);
             if (parent == null) {
-                throw new IllegalArgumentException("Parent location not found");
+                throw new EntityNotFoundException("Parent location not found");
             }
             location.setParent(parent);
         }
@@ -50,7 +52,7 @@ public class LocationService {
     public String getProvinceNameByVillageId(UUID villageId) {
         Location current = locationDao.findById(villageId);
         if (current == null) {
-            throw new IllegalArgumentException("Village not found");
+            throw new EntityNotFoundException("Village not found");
         }
 
         // walk up the parents until we find PROVINCE
@@ -63,7 +65,7 @@ public class LocationService {
         }
 
         if (current == null) {
-            throw new IllegalArgumentException("Province not found for this village");
+            throw new EntityNotFoundException("Province not found for this village");
         }
         return current.getLocationName();
     }
@@ -72,10 +74,10 @@ public class LocationService {
     public String getProvinceNameByPersonId(UUID personId) {
         User user = userDao.findById(personId);
         if (user == null) {
-            throw new IllegalArgumentException("Person not found");
+            throw new EntityNotFoundException("Person not found");
         }
         if (user.getVillage() == null) {
-            throw new IllegalArgumentException("Person has no village");
+            throw new BusinessRuleViolationException("Person has no village");
         }
         return getProvinceNameByVillageId(user.getVillage().getLocationId());
     }
