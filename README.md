@@ -1,5 +1,7 @@
 # AUCA Library Management System
 
+[![CI](https://github.com/Habimana06/finalExam_testing_26432/actions/workflows/ci.yml/badge.svg)](https://github.com/Habimana06/finalExam_testing_26432/actions/workflows/ci.yml)
+
 Student final project for the course **Software Testing and Techniques**.
 
 The system manages real (hard copy) books in the library. It tracks who borrowed a book, membership limits, due dates, and late return fees.
@@ -17,6 +19,8 @@ No user interface is included. Data is inserted and verified using JUnit 4 tests
 - JUnit 4
 
 Main package: `com.auca.library`
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for layer responsibilities and data flow.
 
 ---
 
@@ -36,22 +40,50 @@ Person is **not** created as a table in the database.
 
 ---
 
-## How to setup
+## Prerequisites
 
-**Step 1 — create the database**
+- Java 21
+- Maven 3.9+
+- Docker (for local PostgreSQL)
 
-```sql
-CREATE DATABASE auca_library_db;
+---
+
+## How to setup (fresh clone)
+
+**Step 1 — start PostgreSQL**
+
+```bash
+docker compose up -d
 ```
 
-**Step 2 — update login details**
+This creates `auca_library_db` with user `postgres` / password `postgres` (see `.env.example` to customize).
 
-Open `src/main/resources/application.properties` and set your PostgreSQL username and password.
-
-**Step 3 — run tests**
+**Step 2 — run tests**
 
 ```bash
 mvn test
+```
+
+Optional: copy `.env.example` to `.env` and export variables if you use non-default credentials:
+
+```bash
+export DB_URL=jdbc:postgresql://localhost:5432/auca_library_db
+export DB_USER=postgres
+export DB_PASSWORD=postgres
+mvn test
+```
+
+**Full verify** (Checkstyle, dependency audit, tests, JaCoCo report):
+
+```bash
+mvn verify
+```
+
+Or use the Makefile:
+
+```bash
+make up
+make verify
 ```
 
 ---
@@ -110,6 +142,8 @@ Normal loan period is 14 days.
 | LateFeeTest | late return charges |
 | BookServiceTest | assign book to shelf |
 | RoomServiceTest | shelf/room and book counts |
+
+All tests live under `src/test/java/com/auca/library` and run in CI on every push.
 
 ---
 

@@ -1,0 +1,12 @@
+{
+  "name": "AUCA Library",
+  "image": "maven:3.9-eclipse-temurin-21",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "customizations": {
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack"]
+    }
+  },
+  "forwardPorts": [5432],
+  "postCreateCommand": "apt-get update && apt-get install -y docker.io || true"
+}
