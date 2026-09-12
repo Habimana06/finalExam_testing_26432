@@ -28,6 +28,7 @@ public class HibernateUtil {
 
             Properties properties = new Properties();
             properties.load(input);
+            applyEnvironmentOverrides(properties);
 
             return new Configuration()
                     .addProperties(properties)
@@ -43,6 +44,19 @@ public class HibernateUtil {
 
         } catch (IOException e) {
             throw new RuntimeException("Could not read " + propertiesFile, e);
+        }
+    }
+
+    private static void applyEnvironmentOverrides(Properties properties) {
+        overrideFromEnv(properties, "hibernate.connection.url", "DB_URL");
+        overrideFromEnv(properties, "hibernate.connection.username", "DB_USER");
+        overrideFromEnv(properties, "hibernate.connection.password", "DB_PASSWORD");
+    }
+
+    private static void overrideFromEnv(Properties properties, String propertyKey, String envKey) {
+        String value = System.getenv(envKey);
+        if (value != null && !value.isBlank()) {
+            properties.setProperty(propertyKey, value);
         }
     }
 }
