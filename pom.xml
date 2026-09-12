@@ -16,7 +16,7 @@
     <junit.version>4.13.2</junit.version>
     <postgresql.version>42.7.13</postgresql.version>
     <hibernate.version>6.5.2.Final</hibernate.version>
-    <checkstyle.version>10.18.2</checkstyle.version>
+    <checkstyle.version>14.1.0</checkstyle.version>
     <dependency-check.version>11.1.0</dependency-check.version>
     <jacoco.version>0.8.12</jacoco.version>
   </properties>
